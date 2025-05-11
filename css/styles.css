@@ -3831,7 +3831,7 @@ img.u-pull-left {
     display : none;
 }
 
-.modal-popup__details {
+.modal-popup__details1 {
     background-color : rgba(0, 0, 0, 0.3);
     font-size        : var(--text-xs);
     line-height      : var(--vspace-1_25);
@@ -3841,6 +3841,18 @@ img.u-pull-left {
     top              : var(--vspace-1);
     left             : var(--vspace-1);
 }
+
+.modal-popup__details2 {
+    background-color : rgba(0, 0, 0, 0.3);
+    font-size        : var(--text-xs);
+    line-height      : var(--vspace-1_25);
+    color            : white;
+    padding          : 0 1.2rem;
+    position         : absolute;
+    top              : var(--vspace-1);
+    left             : var(--vspace-4);
+}
+
 
 .modal-popup__details:focus,
 .modal-popup__details:hover {
