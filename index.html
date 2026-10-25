@@ -31,17 +31,17 @@ document.documentElement.setAttribute('data-theme',t)})();
 :root[data-theme="light"]{
   color-scheme:light;
   --paper:#b2e0f7;      /* fond : bleu très pâle */
-  --panel:#b4daf9;
-  --ink:#132030;        /* texte */
-  --mute:#7ea1c4;       /* texte secondaire */
+  --panel:#cad9e5;
+  --ink:#081424;        /* texte */
+  --mute:#2f4c69;       /* texte secondaire */
   --line:#9fc6ef;
-  --side:#AABDD1;       /* face latérale des blocs / ombres extrudées */
+  --side:#a3d3ec;       /* face latérale des blocs / ombres extrudées */
   --accent:#2672af;     /* liens, rôle */
-  --warm:#93efec;       /* complémentaire : la lumière du feu follet, survols */
+  --warm:#93d3ef;       /* complémentaire : la lumière du feu follet, survols */
   --btn-bg:#4c9adf;
-  --btn-fg:#F2F7FB;
+  --btn-fg:#c2e0f8;
   --grid:rgba(19,32,48,.09);
-  --chk1:#C7D5E3; --chk2:#D8E3EE;
+  --chk1:#94bde5; --chk2:#7eb8f1;
   --glow-a:.28;
   --display:"Shantell Sans","Comic Sans MS",system-ui,-apple-system,"Segoe UI",sans-serif;
   --body:"Shantell Sans","Comic Sans MS",system-ui,-apple-system,"Segoe UI",sans-serif;
@@ -69,6 +69,7 @@ html{background:var(--paper)}
 body{color:var(--ink);font:400 1.05rem/1.7 var(--body);-webkit-font-smoothing:antialiased}
 /* Le blockout + le feu follet couvrent tout le site, derrière le contenu */
 #blockout{position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none}
+#wisp{position:fixed;inset:0;width:100%;height:100%;z-index:10000;pointer-events:none}   /* le feu follet reste au-dessus de tout (cartes, jeu, lightbox) */
 h1,h2,h3,.ui{font-family:var(--display)}
 a{color:inherit}
 :focus-visible{outline:3px solid var(--accent);outline-offset:3px}
@@ -129,7 +130,7 @@ a{color:inherit}
 .btn-row{display:flex;flex-wrap:wrap;gap:1.1rem}
 
 /* ---------- Hero ---------- */
-.hero{position:relative;min-height:min(88svh,820px);display:flex;align-items:flex-end;border-bottom:1px solid var(--line)}
+.hero{position:relative;min-height:min(88svh,820px);display:flex;align-items:flex-end}
 .hero-inner{position:relative;width:100%;padding-block:calc(clamp(1.5rem,4vh,3rem) + var(--hw-h,0px) + var(--lvl-pad,0px)) clamp(2rem,6vh,4rem)}
 .name{font-size:clamp(3.5rem,12vw,9.5rem);line-height:.95;letter-spacing:.01em}
 .name span{display:block}
@@ -344,6 +345,41 @@ footer{margin-top:clamp(1.5rem,4vw,3rem);border-top:1px solid var(--line);paddin
   .btn,.thumb,.arrows button{transition:none}
 }
 
+
+/* ---------- Invitation à scroller (fixée en bas de la fenêtre, disparaît dès qu'on scrolle) ---------- */
+.scroll-cue{position:fixed;left:50%;bottom:1.25rem;translate:-50% 0;z-index:9;display:inline-flex;align-items:center;gap:.5rem;
+  padding:.45rem 1rem;font:600 .95rem var(--display);text-decoration:none;background:var(--btn-bg);color:var(--btn-fg);
+  border:1.5px solid var(--ink);box-shadow:3px 3px 0 var(--side);transition:opacity .3s,transform .2s,box-shadow .2s}
+.scroll-cue:hover,.scroll-cue:focus-visible{transform:translate(-2px,-2px);box-shadow:5px 5px 0 var(--warm)}
+.scroll-cue svg{animation:cue-bounce 1.4s ease-in-out infinite}
+.scroll-cue.gone{opacity:0;pointer-events:none}
+@keyframes cue-bounce{0%,100%{transform:translateY(-2px)}50%{transform:translateY(4px)}}
+@media (max-width:899px){.scroll-cue{left:1rem;translate:none;bottom:1rem}}
+@media (prefers-reduced-motion:reduce){.scroll-cue svg{animation:none}}
+
+/* ---------- Barre de scroll perso ---------- */
+html{scrollbar-gutter:auto}
+::-webkit-scrollbar{width:14px;height:14px}
+::-webkit-scrollbar-track{background:var(--paper);border-left:1.5px solid var(--line)}
+::-webkit-scrollbar-thumb{background:var(--warm);border:2px solid var(--ink);box-shadow:inset -3px -3px 0 var(--side)}
+::-webkit-scrollbar-thumb:hover{background:var(--btn-bg)}
+::-webkit-scrollbar-corner{background:var(--paper)}
+@supports (-moz-appearance:none){html{scrollbar-width:thin;scrollbar-color:var(--warm) var(--paper)}}
+/* Barre de progression tout en haut : se remplit en descendant, avec un petit feu follet au bout */
+.scroll-progress{position:fixed;top:0;left:0;right:0;height:4px;z-index:11;pointer-events:none}
+.scroll-progress b{position:absolute;inset:0;background:var(--warm);transform-origin:0 50%;transform:scaleX(var(--p,0));
+  box-shadow:0 1px 0 var(--ink)}
+.scroll-progress i{position:absolute;top:-4px;left:calc(var(--p,0) * 100%);width:12px;height:12px;margin-left:-6px;border-radius:50%;
+  background:var(--warm);border:2px solid var(--ink);box-shadow:0 0 10px 2px var(--warm)}
+
+/* Les projets apparaissent en glissant quand on scrolle (sinon ils sont simplement visibles) */
+@supports (animation-timeline:view()){
+  @media (prefers-reduced-motion:no-preference){
+    .projects > li{animation:proj-rise linear both;animation-timeline:view();animation-range:entry 0% entry 40%}
+    @keyframes proj-rise{from{opacity:0;transform:translateY(48px)}to{opacity:1;transform:none}}
+  }
+}
+
 /* ---------- Typo dessinée main : INFM = degré de "dessiné", BNCE = rebond des lettres (0 = aucun) ---------- */
 *{font-variation-settings:"BNCE" 0,"INFM" 35 !important}
 .btn,.filters button,.bar nav a,.lang button,.skills li,.proj-role,.role,.pager a,.mail{font-variation-settings:"BNCE" 0,"INFM" 70 !important}
@@ -352,6 +388,8 @@ h1,h2,h3,.brand{font-variation-settings:"BNCE" 0,"INFM" 100 !important}
 </head>
 <body>
 <canvas id="blockout" aria-hidden="true"></canvas>
+<canvas id="wisp" aria-hidden="true"></canvas>
+<div class="scroll-progress" id="scroll-progress" aria-hidden="true"><b></b><i></i></div>
 
 <header class="bar">
   <div class="container">
@@ -387,6 +425,7 @@ h1,h2,h3,.brand{font-variation-settings:"BNCE" 0,"INFM" 100 !important}
       </div>
     </div>
     <p class="hint" data-i18n="hint">Move your cursor to light up the blockout.</p>
+    <a class="scroll-cue" id="scroll-cue" href="#/projects"><span data-i18n="scrollCue">Scroll</span><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v15M5 13l7 7 7-7"/></svg></a>
     <aside class="game" id="game">
       <div class="game-top"><span class="game-name" id="g-name"></span><span class="game-count" id="g-count"></span></div>
       <div class="game-msg" id="g-msg" role="status" aria-live="polite"></div>
@@ -538,7 +577,7 @@ const T = {
   en: {
     navLabel:'Main', navProjects:'Projects', navAbout:'About', navContact:'Contact',
     blurb:'Hi to everyone who will stumble upon my lovely portfolio. I am a game designer, and level designer fueled by the power of unholy amounts of coffee in my bloodstream, and with the sole focus to create the best experience for our, and us, players.',
-    seeProjects:'See projects', downloadCv:'Download CV',
+    seeProjects:'See projects', scrollCue:'Scroll', downloadCv:'Download CV',
     hint:'Feel free to use your arrow keys to try out the sokoban.',
     gLvl1:'Easy', gLvl2:'Medium', gLvl2b:'Medium 2', gLvl3:'Hard', gLvl3b:'Hard 2', gMoves:'moves', gWin:'Solved!', gPrev:'Previous level', gNext:'Next level', gUndo:'Undo (U)', gReset:'Restart (R)', gToggle:'Game keys on/off', gHelp:'Push the crates onto the star. WASD / arrows to move, U undo, R restart. Water blocks you: fill it with a crate.',
     projectsTitle:'Projects', filterLabel:'Filter projects',
@@ -582,7 +621,7 @@ const T = {
   fr: {
     navLabel:'Principal', navProjects:'Projets', navAbout:'À propos', navContact:'Contact',
     blurb:"Bonjour à tous ceux qui tomberaient par mégarde (ou non) sur mon portfolio. Je suis une Game et Level Designer, avec un peu trop de cafés dans le sang et un seul objectif: créer les meilleures expériences pour les joueur.euse.s.",
-    seeProjects:'Voir les projets', downloadCv:'Télécharger mon CV',
+    seeProjects:'Voir les projets', scrollCue:'Défiler', downloadCv:'Télécharger mon CV',
     hint:"N'hésitez pas à utiliser vos flèches pour vous essayer au sokoban.",
     gLvl1:'Facile', gLvl2:'Moyen', gLvl2b:'Moyen 2', gLvl3:'Difficile', gLvl3b:'Difficile 2', gMoves:'coups', gWin:'Résolu !', gPrev:'Niveau précédent', gNext:'Niveau suivant', gUndo:'Annuler (U)', gReset:'Recommencer (R)', gToggle:'Touches du jeu on/off', gHelp:"Pousse les caisses sur l'étoile. ZQSD / flèches pour bouger, U annuler, R recommencer. L'eau te bloque : comble-la avec une caisse.",
     projectsTitle:'Projets', filterLabel:'Filtrer les projets',
@@ -592,7 +631,7 @@ const T = {
     docAlt:'{title}',
     aboutTitle:'À propos',
     about1:"J'ai toujours rêvé de raconter des histoires qui comptent. Enfant, j'imaginais des fées et des esprits des bois veillant sur moi, et cette imagination s'est vite transformée en romans écrits dès l'âge de neuf ans.",
-    about2:"Plus tard, j'ai animé de courtes parties de Donjons & Dragons, angoissantes, mystérieuses ou complètement absurdes, et j'ai découvert combien j'aime guider les joueurs à travers le chaos que je crée. Cela m'a menée vers les jeux à forte narration, des récits ludiques pleins de jeux de mots aux histoires à embranchements plus profondes.",
+    about2:"Plus tard, j'ai animé de courtes parties de Donjons & Dragons, angoissantes, mystérieuses ou complètement absurdes, et j'ai découvert combien j'aime guider les joueurs à travers le chaos que je crée. Cela m'a mené vers les jeux à forte narration, des récits ludiques pleins de jeux de mots aux histoires à embranchements plus profondes.",
     about3:"De la conception de niveaux de jeux de plateforme à celle de cartes, ça, c'était vraiment génial. Bien sûr, à quoi sert un niveau si on ne peut pas l'associer à des mécanismes de jeu exceptionnels ? Le sens et l'intention sont rapidement devenus mes priorités. Assembler tous ces éléments, tisser cette trame pour obtenir un ensemble cohérent, tant au niveau visuel que de l'expérience, c'est ce que j'aime par-dessus tout.",
     portraitAlt:'Portrait de Gabrielle Sienko',
     eduTitle:'Formation', expTitle:'Expérience',
@@ -1423,6 +1462,7 @@ route();
    ========================================================= */
 (function(){
   const cv = $('#blockout'), ctx = cv.getContext('2d');
+  const cvTop = $('#wisp'), ctxTop = cvTop.getContext('2d');   // calque du dessus : uniquement le feu follet
   const CELL = 48, GAP = 2, CH = 8, LIFT_MAX = 21;
 
   /* Réglages de couleur par thème : [saturation %, luminosité %].
@@ -1506,7 +1546,7 @@ route();
      (la caisse disparaît, l'eau devient un passage). But : une caisse sur l'étoile.
      ========================================================= */
   /* Image de fond du hero (derrière le Sokoban). Mets '' pour la retirer. */
-  const HERO_IMG = 'images/hero/background.jpg';
+  const HERO_IMG = 'images/hero/background.png';
   const heroImg = new Image(); let heroImgOk = false;
   if (HERO_IMG){ heroImg.onload = () => { heroImgOk = true; kick(); }; heroImg.src = HERO_IMG; }
   const HERO_PANEL_A = .62;                                 // opacité du cadre d'accueil (0 = image seule) : plus bas = image de fond plus visible
@@ -1751,7 +1791,7 @@ route();
       ? {floor:'rgba(140,200,255,.13)', frame:'rgba(140,200,255,.6)', water:'#3F8CE0', wave:'rgba(220,240,255,.45)',
          bridge:'#7A5A2E', plank:'rgba(0,0,0,.28)', crT:'#B8873A', crS:'#6E4E1A', crM:'rgba(0,0,0,.25)',
          plT:'#FF8A5C', plS:'#B8431F', star:'#FFD84D', starE:'#B8860B'}
-      : {floor:'rgba(255,255,255,.92)', frame:'rgba(19,32,48,.6)', water:'#69B4FF', wave:'rgba(255,255,255,.65)',
+      : { floor:'rgba(38,114,175,.30)', frame:'rgba(19,32,48,.6)', water:'#69B4FF', wave:'rgba(255,255,255,.65)',
          bridge:'#C9A063', plank:'rgba(60,35,5,.25)', crT:'#C99A3E', crS:'#8A6420', crM:'rgba(60,35,5,.25)',
          plT:'#F26B3A', plS:'#B8431F', star:'#FFD84D', starE:'#B8860B'};
     const cell = (rr, cc) => [LX + cc * LC + g, LY + rr * LC + g];
@@ -1762,8 +1802,7 @@ route();
     };
 
     // cadre du niveau + sols (plats)
-    ctx.strokeStyle = C.frame; ctx.lineWidth = 1.5; ctx.strokeRect(LX - .5, LY - .5, SW + 1, SH + 1);
-    for (let rr = 0; rr < NR; rr++) for (let cc = 0; cc < NC; cc++){
+      if (!dark){ ctx.fillStyle = 'rgba(38,114,175,.14)'; ctx.fillRect(LX, LY, SW, SH); }    for (let rr = 0; rr < NR; rr++) for (let cc = 0; cc < NC; cc++){
       if (walls[rr][cc]) continue;
       const [x, y] = cell(rr, cc), k = rr * NC + cc;
       if (water.has(k)){
@@ -1894,9 +1933,15 @@ route();
     g.addColorStop(1, `rgba(${WARM.join(',')},0)`);
     ctx.fillStyle = g;
     ctx.fillRect(wisp.x - radius, wisp.y - radius, radius * 2, radius * 2);
-    ctx.beginPath(); ctx.arc(wisp.x, wisp.y, 6, 0, Math.PI * 2);
-    ctx.fillStyle = `rgb(${WARM.join(',')})`; ctx.fill();
-    ctx.lineWidth = 2; ctx.strokeStyle = PAPER; ctx.stroke();
+    // le feu follet lui-même : sur le calque du dessus, donc jamais caché par une carte
+    ctxTop.clearRect(0, 0, W, Hv);
+    const halo = ctxTop.createRadialGradient(wisp.x, wisp.y, 0, wisp.x, wisp.y, 26);
+    halo.addColorStop(0, `rgba(${WARM.join(',')},.45)`);
+    halo.addColorStop(1, `rgba(${WARM.join(',')},0)`);
+    ctxTop.fillStyle = halo; ctxTop.fillRect(wisp.x - 26, wisp.y - 26, 52, 52);
+    ctxTop.beginPath(); ctxTop.arc(wisp.x, wisp.y, 6, 0, Math.PI * 2);
+    ctxTop.fillStyle = `rgb(${WARM.join(',')})`; ctxTop.fill();
+    ctxTop.lineWidth = 2; ctxTop.strokeStyle = INK; ctxTop.stroke();
   }
 
   function frame(now){
@@ -1925,6 +1970,8 @@ route();
     W = w; Hv = h; cols = Math.ceil(W / CELL);
     cv.width = W * dpr; cv.height = Hv * dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    cvTop.width = W * dpr; cvTop.height = Hv * dpr;
+    ctxTop.setTransform(dpr, 0, 0, dpr, 0, 0);
     if (!wisp.ready){ wisp.x = wisp.tx = W * .7; wisp.y = wisp.ty = Hv * .4; wisp.ready = true; }
     layoutHello();
     draw(); kick();
@@ -1950,6 +1997,18 @@ route();
   loadLevel(lvlIdx);
   readColors();
   resize();
+})();
+</script>
+<script>
+(function(){
+  const cue = document.getElementById('scroll-cue');
+  const bar = document.getElementById('scroll-progress');
+  function upd(){
+    const max = document.documentElement.scrollHeight - innerHeight;
+    if (bar) bar.style.setProperty('--p', max > 0 ? Math.min(1, Math.max(0, scrollY / max)) : 0);
+    if (cue) cue.classList.toggle('gone', scrollY > 60);
+  }
+  addEventListener('scroll', upd, {passive:true}); addEventListener('resize', upd); addEventListener('hashchange', upd); upd();
 })();
 </script>
 </body>
